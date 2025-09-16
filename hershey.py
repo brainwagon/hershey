@@ -1,4 +1,6 @@
-def parse_hershey_font(filename):
+from typing import cast, Dict, List, Optional, Tuple
+
+def parse_hershey_font(filename: str) -> Dict[int, Dict[str, object]]:
     """
     Parse a Hershey font file and return a dictionary of glyph definitions.
 
@@ -11,14 +13,14 @@ def parse_hershey_font(filename):
             - 'right': right hand position
             - 'coordinates': list of (x, y) tuples with None indicating pen up operations
     """
-    glyphs = {}
+    glyphs: Dict[int, Dict[str, object]] = {}
 
     with open(filename, 'r') as file:
-        lines = [line.rstrip('\n\r') for line in file]  # Read all lines and remove line endings
+        lines: List[str] = [line.rstrip('\n\r') for line in file]  # Read all lines and remove line endings
 
-    i = 0
+    i: int = 0
     while i < len(lines):
-        line = lines[i]
+        line: str = lines[i]
 
         if len(line) < 10:  # Skip lines that are too short
             i += 1
@@ -26,24 +28,24 @@ def parse_hershey_font(filename):
 
         try:
             # Parse glyph number (columns 0:4, right-justified)
-            glyph_num = int(line[0:5].strip())
+            glyph_num: int = int(line[0:5].strip())
 
             # Parse number of vertices (columns 5:7)
-            num_vertices = int(line[5:8])
+            num_vertices: int = int(line[5:8])
 
             # Parse left and right positions (columns 8 and 9)
-            left_char = line[8]
-            right_char = line[9]
-            left_pos = ord(left_char) - ord('R')
-            right_pos = ord(right_char) - ord('R')
+            left_char: str = line[8]
+            right_char: str = line[9]
+            left_pos: int = ord(left_char) - ord('R')
+            right_pos: int = ord(right_char) - ord('R')
 
             # Collect all coordinate data, potentially from multiple lines
-            coord_data = line[10:]  # Start with data from first line
+            coord_data: str = line[10:]  # Start with data from first line
 
             # The number of coordinate pairs we need (num_vertices includes left/right positions)
-            target_pairs = num_vertices - 1
+            target_pairs: int = num_vertices - 1
 
-            line_idx = i
+            line_idx: int = i
             # Continue reading lines until we have enough character pairs for all coordinates
             while len(coord_data) < target_pairs * 2 and line_idx + 1 < len(lines):
                 line_idx += 1
@@ -54,21 +56,21 @@ def parse_hershey_font(filename):
             # print(f"Glyph {glyph_num}: target_pairs={target_pairs}, coord_data_len={len(coord_data)}, coord_data='{coord_data}'")
 
             # Now process all the coordinate data
-            coordinates = []
-            j = 0
+            coordinates: List[Optional[Tuple[int, int]]] = []
+            j: int = 0
 
             # Process exactly target_pairs coordinate pairs
             while j < len(coord_data) - 1 and len(coordinates) < target_pairs:
-                x_char = coord_data[j]
-                y_char = coord_data[j + 1]
+                x_char: str = coord_data[j]
+                y_char: str = coord_data[j + 1]
 
                 # Check for pen up operation (space followed by 'R')
                 if x_char == ' ' and y_char == 'R':
                     coordinates.append(None)
                 else:
                     # Convert characters to coordinates relative to 'R'
-                    x = ord(x_char) - ord('R')
-                    y = ord(y_char) - ord('R')
+                    x: int = ord(x_char) - ord('R')
+                    y: int = ord(y_char) - ord('R')
                     coordinates.append((x, y))
 
                 j += 2
@@ -93,7 +95,7 @@ def parse_hershey_font(filename):
 
 
 
-def parse_hershey_mapping(filename):
+def parse_hershey_mapping(filename: str) -> Dict[str, int]:
     """
     Parse a Hershey font ASCII mapping file and return a dictionary.
 
@@ -106,22 +108,22 @@ def parse_hershey_mapping(filename):
     Returns:
         dict: Dictionary where keys are ASCII characters and values are Hershey glyph numbers
     """
-    ascii_to_glyph = {}
+    ascii_to_glyph: Dict[str, int] = {}
 
     with open(filename, 'r') as file:
-        content = file.read()
+        content: str = file.read()
 
     # Split on whitespace to get all tokens
-    tokens = content.split()
+    tokens: List[str] = content.split()
 
-    ascii_code = 32  # Start from ASCII 32 (space)
+    ascii_code: int = 32  # Start from ASCII 32 (space)
 
     for token in tokens:
         if '-' in token and not token.startswith('-'):
             # Handle range like "700-709" or "501-526"
             start_str, end_str = token.split('-')
-            start_num = int(start_str)
-            end_num = int(end_str)
+            start_num: int = int(start_str)
+            end_num: int = int(end_str)
 
             # Assign consecutive glyph numbers to consecutive ASCII codes
             for glyph_num in range(start_num, end_num + 1):
@@ -141,7 +143,7 @@ def parse_hershey_mapping(filename):
     return ascii_to_glyph
 
 
-def print_mapping_info(mapping):
+def print_mapping_info(mapping: Dict[str, int]) -> None:
     """
     Print information about the ASCII to glyph mapping.
 
@@ -154,12 +156,12 @@ def print_mapping_info(mapping):
 
     print("\nFirst 10 mappings:")
     for i, (char, glyph) in enumerate(sorted(mapping.items())[:10]):
-        ascii_val = ord(char)
-        char_display = repr(char) if char.isprintable() and char != ' ' else f"ASCII {ascii_val}"
+        ascii_val: int = ord(char)
+        char_display: str = repr(char) if char.isprintable() and char != ' ' else f"ASCII {ascii_val}"
         print(f"  {char_display} -> glyph {glyph}")
 
     print("\nSample letter mappings:")
-    sample_chars = ['A', 'B', 'C', 'a', 'b', 'c', '0', '1', '2']
+    sample_chars: List[str] = ['A', 'B', 'C', 'a', 'b', 'c', '0', '1', '2']
     for char in sample_chars:
         if char in mapping:
             print(f"  '{char}' -> glyph {mapping[char]}")
@@ -179,27 +181,27 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Example of how to use the function
-    glyphs = parse_hershey_font(args.data)
+    glyphs: Dict[int, Dict[str, object]] = parse_hershey_font(args.data)
     
     # create a DXF 
     doc = ezdxf.new("R2010")
     msp = doc.modelspace()
 
-    x = 0
-    y = 0
-    last = None
-    pline = []
-    mapping = parse_hershey_mapping(args.font)
+    x: int = 0
+    y: int = 0
+    last: Optional[Tuple[int, int]] = None
+    pline: List[Tuple[int, int]] = []
+    mapping: Dict[str, int] = parse_hershey_mapping(args.font)
     for ch in args.text:
         if ch in mapping:
-            g = mapping[ch]
+            g: int = mapping[ch]
             if g in glyphs:
                 if args.verbose:
                     print(f"# glyph {ch} - {g}")
-                glyph = glyphs[g]
-                left = glyph["left"]
-                right = glyph["right"]
-                coords = glyph["coordinates"]
+                glyph: Dict[str, object] = glyphs[g]
+                left: int = cast(int, glyph["left"])
+                right: int = cast(int, glyph["right"])
+                coords: List[Optional[Tuple[int, int]]] = cast(List[Optional[Tuple[int, int]]], glyph["coordinates"])
                 x = x - left 
                 for c in coords:
                     if c == None:
