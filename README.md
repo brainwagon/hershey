@@ -49,11 +49,13 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -f FONT, --font FONT  The Hershey font mapping file to use.
+  -f FONT, --font FONT  The Hershey font mapping file to use. (default:
+                        mappings/romant.hmp)
   -o OUTPUT, --output OUTPUT
-                        The name of the output DXF file.
-  -d DATA, --data DATA  The path to the Hershey font data file.
-  -v, --verbose         Print verbose output.
+                        The name of the output DXF file. (default: sign.dxf)
+  -d DATA, --data DATA  The path to the Hershey font data file. (default:
+                        data/hershey_font.dat)
+  -v, --verbose         Print verbose output. (default: False)
 ```
 
 

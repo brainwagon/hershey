@@ -170,7 +170,7 @@ import argparse
 
 # Example usage:
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert text to DXF using Hershey fonts.")
+    parser = argparse.ArgumentParser(description="Convert text to DXF using Hershey fonts.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("text", help="The text to convert to DXF.")
     parser.add_argument("-f", "--font", default="mappings/romant.hmp", help="The Hershey font mapping file to use.")
     parser.add_argument("-o", "--output", default="sign.dxf", help="The name of the output DXF file.")
