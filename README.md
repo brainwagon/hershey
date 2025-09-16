@@ -37,3 +37,24 @@ straightforward.
 
 
 
+## Usage
+
+```
+usage: hershey.py [-h] [-f FONT] [-o OUTPUT] [-d DATA] [-v] text
+
+Convert text to DXF using Hershey fonts.
+
+positional arguments:
+  text                  The text to convert to DXF.
+
+options:
+  -h, --help            show this help message and exit
+  -f FONT, --font FONT  The Hershey font mapping file to use.
+  -o OUTPUT, --output OUTPUT
+                        The name of the output DXF file.
+  -d DATA, --data DATA  The path to the Hershey font data file.
+  -v, --verbose         Print verbose output.
+```
+
+
+

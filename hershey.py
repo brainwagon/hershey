@@ -166,11 +166,20 @@ def print_mapping_info(mapping):
 
 
 import ezdxf
+import argparse
 
 # Example usage:
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Convert text to DXF using Hershey fonts.")
+    parser.add_argument("text", help="The text to convert to DXF.")
+    parser.add_argument("-f", "--font", default="mappings/romant.hmp", help="The Hershey font mapping file to use.")
+    parser.add_argument("-o", "--output", default="sign.dxf", help="The name of the output DXF file.")
+    parser.add_argument("-d", "--data", default="data/hershey_font.dat", help="The path to the Hershey font data file.")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Print verbose output.")
+    args = parser.parse_args()
+
     # Example of how to use the function
-    glyphs = parse_hershey_font('data/hershey_font.dat')
+    glyphs = parse_hershey_font(args.data)
     
     # create a DXF 
     doc = ezdxf.new("R2010")
@@ -180,12 +189,13 @@ if __name__ == "__main__":
     y = 0
     last = None
     pline = []
-    mapping = parse_hershey_mapping('mappings/romant.hmp')
-    for ch in "Mark Loves Carmen":
+    mapping = parse_hershey_mapping(args.font)
+    for ch in args.text:
         if ch in mapping:
             g = mapping[ch]
             if g in glyphs:
-                print(f"# glyph {ch} - {g}")
+                if args.verbose:
+                    print(f"# glyph {ch} - {g}")
                 glyph = glyphs[g]
                 left = glyph["left"]
                 right = glyph["right"]
@@ -193,18 +203,22 @@ if __name__ == "__main__":
                 x = x - left 
                 for c in coords:
                     if c == None:
-                        msp.add_lwpolyline(pline)
+                        if len(pline) > 0:
+                            msp.add_lwpolyline(pline)
                         pline = []
-                        print("")
+                        if args.verbose:
+                            print("")
                         last = None
                     else:
-                        print(f"{x+c[0]} {-y-c[1]}")
+                        if args.verbose:
+                            print(f"{x+c[0]} {-y-c[1]}")
                         last = (x+c[0], -y-c[1])
                         pline.append(last)
                 x += right
-        print()
+        if args.verbose:
+            print()
         if len(pline) > 0:
             msp.add_lwpolyline(pline)
         last = None
         pline = []
-    doc.saveas("sign.dxf")
+    doc.saveas(args.output)
